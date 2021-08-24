@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 using basic_banking_app_server.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace basic_banking_app_server
 {
@@ -31,6 +31,7 @@ namespace basic_banking_app_server
             _dbKey = Configuration["ConnectionString"];
             services.AddDbContext<BasicBankContext>(options => options.UseNpgsql(_dbKey));
             services.AddControllers();
+            services.AddScoped<IUserRepo, MockUserRepo>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
