@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using basic_banking_app_server.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace basic_banking_app_server
 {
     public class Startup
@@ -19,10 +22,14 @@ namespace basic_banking_app_server
             Configuration = configuration;
         }
 
+        private string _dbKey = null;
+
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            _dbKey = Configuration["ConnectionString"];
+            services.AddDbContext<BasicBankContext>(options => options.UseNpgsql(_dbKey));
             services.AddControllers();
         }
 
