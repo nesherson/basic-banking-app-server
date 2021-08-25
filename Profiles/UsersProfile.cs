@@ -10,6 +10,9 @@ namespace basic_banking_app_server.Profiles
         public UsersProfile()
         {
             CreateMap<User, UserReadDto>();
+            CreateMap<UserCreateDto, User>();
+            CreateMap<UserUpdateDto, User>();
+            CreateMap<User, UserUpdateDto>();
         }
     }
 }
