@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Serialization;
 
 using basic_banking_app_server.Data;
 
@@ -30,7 +31,9 @@ namespace basic_banking_app_server
         {
             _dbKey = Configuration["ConnectionString"];
             services.AddDbContext<BasicBankContext>(options => options.UseNpgsql(_dbKey));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(s => {
+                s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IUserRepo, UserRepo>();
         }
