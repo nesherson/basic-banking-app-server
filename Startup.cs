@@ -31,7 +31,8 @@ namespace basic_banking_app_server
             _dbKey = Configuration["ConnectionString"];
             services.AddDbContext<BasicBankContext>(options => options.UseNpgsql(_dbKey));
             services.AddControllers();
-            services.AddScoped<IUserRepo, MockUserRepo>();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddScoped<IUserRepo, UserRepo>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
