@@ -13,7 +13,7 @@ using basic_banking_app_server.Dtos;
 
 namespace basic_banking_app_server.Controllers
 {
-    [Route("api/users")]
+    [Route("users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
