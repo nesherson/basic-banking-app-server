@@ -27,7 +27,19 @@ namespace basic_banking_app_server.Data
             var user = _context.Users.FirstOrDefault(user => user.Id == id);
 
             return user;
+        }
 
+        public void CreateUser(User user)
+        {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
+            _context.Users.Add(user);
+        }
+
+        public bool SaveChanges()
+        {
+            return _context.SaveChanges() >= 0;
         }
     }
 }

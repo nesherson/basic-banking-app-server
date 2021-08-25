@@ -11,5 +11,8 @@ namespace basic_banking_app_server.Data
     {
         IEnumerable<User> GetAllUsers();
         User GetUserById(int id);
+        void CreateUser(User user);
+
+        bool SaveChanges();
     }
 }

@@ -18,6 +18,12 @@ namespace basic_banking_app_server.Data
                 new User { Id = 3, Email = "tim@test.com", FirstName = "Tim", LastName = "Goliath", Password = "123tim" }
 
             };
+
+        public void CreateUser(User user)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<User> GetAllUsers()
         {
             return users;
@@ -28,6 +34,11 @@ namespace basic_banking_app_server.Data
             var user = users.Find(user => user.Id == id);
 
             return user;
+        }
+
+        public bool SaveChanges()
+        {
+            throw new NotImplementedException();
         }
     }
 }
