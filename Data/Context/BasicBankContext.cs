@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 using basic_banking_app_server.Models;
 
-namespace basic_banking_app_server.Data
+namespace basic_banking_app_server.Data.Context
 {
     public partial class BasicBankContext : DbContext
     {

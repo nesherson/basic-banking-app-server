@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace basic_banking_app_server.Dtos
+namespace basic_banking_app_server.Dtos.UserDto
 {
     public partial class UserCreateDto
     {
         [Required]
         [MaxLength(30)]
+        [EmailAddress]
         public string Email { get; set; }
 
         [Required]

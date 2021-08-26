@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace basic_banking_app_server.Data
+using basic_banking_app_server.Data.Context;
+
+namespace basic_banking_app_server.Data.UserRepo
 {
     public class UserRepo : IUserRepo
     {

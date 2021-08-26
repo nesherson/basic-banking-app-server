@@ -1,4 +1,4 @@
-﻿namespace basic_banking_app_server.Dtos
+﻿namespace basic_banking_app_server.Dtos.UserDto
 {
     public partial class UserReadDto
     {

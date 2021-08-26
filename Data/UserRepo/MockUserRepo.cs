@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using basic_banking_app_server.Models;
 
-namespace basic_banking_app_server.Data
+namespace basic_banking_app_server.Data.UserRepo
 {
     public class MockUserRepo : IUserRepo
     {

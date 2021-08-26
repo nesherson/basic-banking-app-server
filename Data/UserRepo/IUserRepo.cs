@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 using basic_banking_app_server.Models;
 
-namespace basic_banking_app_server.Data
+namespace basic_banking_app_server.Data.UserRepo
 {
     public interface IUserRepo
     {

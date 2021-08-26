@@ -8,10 +8,10 @@ using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 
 using basic_banking_app_server.Models;
-using basic_banking_app_server.Data;
-using basic_banking_app_server.Dtos;
+using basic_banking_app_server.Data.UserRepo;
+using basic_banking_app_server.Dtos.UserDto;
 
-namespace basic_banking_app_server.Controllers
+namespace basic_banking_app_server.Controllers.Users
 {
     [Route("users")]
     [ApiController]

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 
 using basic_banking_app_server.Models;
-using basic_banking_app_server.Dtos;
+using basic_banking_app_server.Dtos.UserDto;
 
 namespace basic_banking_app_server.Profiles
 {
