@@ -1,47 +1,76 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 using basic_banking_app_server.Data.Context;
 using basic_banking_app_server.Data.UserRepo;
-using basic_banking_app_server.Data.AuthRepo;
 
 namespace basic_banking_app_server
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        private string _dbKey = null;
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            _dbKey = Configuration["ConnectionString"];
-            services.AddDbContext<BasicBankContext>(options => options.UseNpgsql(_dbKey));
+            string dbKey = Configuration["ConnectionString"];
+            services.AddDbContext<BasicBankContext>(options => options.UseNpgsql(dbKey));
 
             services.AddControllers().AddNewtonsoftJson(s => {
                 s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            services.AddScoped<IUserRepo, UserRepo>();
-            services.AddScoped<IAuthRepo, AuthRepo>();
+            string secretKey = Configuration["SecretKey"];
+            var key = System.Text.Encoding.ASCII.GetBytes(secretKey);
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var userRepo = context.HttpContext.RequestServices.GetRequiredService<IUserRepo>();
+                        var userId = int.Parse(context.Principal.Identity.Name);
+                        var user = userRepo.GetUserById(userId);
+                        if (user == null)
+                        {
+                            context.Fail("Unauthorized");
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
+
+            services.AddScoped<IUserRepo, UserRepo>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -53,6 +82,7 @@ namespace basic_banking_app_server
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
