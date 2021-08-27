@@ -1,42 +1,81 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 using basic_banking_app_server.Models;
 using basic_banking_app_server.Data.UserRepo;
 using basic_banking_app_server.Dtos.UserDto;
+using basic_banking_app_server.Dtos.AuthDto;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System;
 
 namespace basic_banking_app_server.Controllers.Users
 {
-    [Route("users")]
+    [Authorize]
+    [Route("")]
     [ApiController]
     public class UsersController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
         private readonly IUserRepo _repository;
         private readonly IMapper _mapper;
 
-
-        public UsersController(IUserRepo repository, IMapper mapper)
+        public UsersController(IUserRepo repository, IMapper mapper, IConfiguration configuration)
         {
+            _configuration = configuration;
             _repository = repository;
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [AllowAnonymous]
+        [Route("signup", Name = "SignupUser")]
+        [HttpPost]
+        public ActionResult<UserReadDto> SignupUser(UserRegisterDto registerModel)
+        {
+            var userModel = _mapper.Map<User>(registerModel);
+            bool isEmailUsed = _repository.IsEmailUsed(userModel.Email);
+
+            if (isEmailUsed)
+                return Conflict(new { message = "Email already exists." });
+
+            _repository.CreateUser(userModel);
+            _repository.SaveChanges();
+
+            var userReadDto = _mapper.Map<UserReadDto>(userModel);
+
+            return CreatedAtRoute(nameof(SignupUser), userReadDto);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public ActionResult LoginUser(UserAuthDto authModel)
+        {
+            var user = _repository.Authenticate(authModel.Email, authModel.Password);
+
+            if (user == null)
+                return BadRequest(new { message = "Email or password is incorrect" });
+
+            var userTokenModel = _mapper.Map<User, UserTokenDto>(user);
+            userTokenModel.Token = _repository.GenerateJwtToken(user);
+
+            return Ok(userTokenModel);
+        }
+
+        [HttpGet("users")]
         public ActionResult<IEnumerable<User>> GetAllUsers()
         {
             var users = _repository.GetAllUsers();
-            var dtoUsers = _mapper.Map<IEnumerable<UserReadDto>>(users);
+            var usersReadModel = _mapper.Map<IEnumerable<UserReadDto>>(users);
 
-            return Ok(dtoUsers);
+            return Ok(usersReadModel);
         }
 
-        [HttpGet("{id}", Name = "GetUserById")]
+        [HttpGet("users/{id}", Name = "GetUserById")]
         public ActionResult<User> GetUserById(int id)
         {
             var user = _repository.GetUserById(id);
@@ -44,12 +83,12 @@ namespace basic_banking_app_server.Controllers.Users
             if (user == null)
                 return NotFound();
 
-            var dtoUser = _mapper.Map<UserReadDto>(user);
+            var userReadModel = _mapper.Map<UserReadDto>(user);
 
-            return Ok(dtoUser);
+            return Ok(userReadModel);
         }
 
-        [HttpPost]
+        [HttpPost("users")]
         public ActionResult<UserReadDto> CreateUser(UserCreateDto userCreateDto)
         {
             var userModel = _mapper.Map<User>(userCreateDto);
@@ -61,28 +100,24 @@ namespace basic_banking_app_server.Controllers.Users
             return CreatedAtRoute(nameof(GetUserById), new { id = userReadDto.Id }, userReadDto);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("users/{id}")]
         public ActionResult UpdateUser(int id, JsonPatchDocument<UserUpdateDto> patchDoc)
         {
-            var userModelFromRepo = _repository.GetUserById(id);
+            var userRepoModel = _repository.GetUserById(id);
 
-            if (userModelFromRepo == null)
+            if (userRepoModel == null)
                 return NotFound();
 
-            var userToPatch = _mapper.Map<UserUpdateDto>(userModelFromRepo);
+            var userToPatch = _mapper.Map<UserUpdateDto>(userRepoModel);
             patchDoc.ApplyTo(userToPatch, ModelState);
 
             if (!TryValidateModel(userToPatch))
                 return ValidationProblem(ModelState);
 
-            _mapper.Map(userToPatch, userModelFromRepo);
+            _mapper.Map(userToPatch, userRepoModel);
             _repository.SaveChanges();
 
             return NoContent();
-
         }
-
-
-
     }
 }

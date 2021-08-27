@@ -19,7 +19,17 @@ namespace basic_banking_app_server.Data.UserRepo
 
             };
 
+        public User Authenticate(string email, string password)
+        {
+            throw new NotImplementedException();
+        }
+
         public void CreateUser(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GenerateJwtToken(User user)
         {
             throw new NotImplementedException();
         }
@@ -34,6 +44,11 @@ namespace basic_banking_app_server.Data.UserRepo
             var user = users.Find(user => user.Id == id);
 
             return user;
+        }
+
+        public bool IsEmailUsed(string email)
+        {
+            throw new NotImplementedException();
         }
 
         public bool SaveChanges()
