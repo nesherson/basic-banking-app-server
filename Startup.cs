@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using basic_banking_app_server.Data.Context;
 using basic_banking_app_server.Data.UserRepo;
+using basic_banking_app_server.Data.CardRepo;
 
 namespace basic_banking_app_server
 {
@@ -71,6 +72,7 @@ namespace basic_banking_app_server
 
 
             services.AddScoped<IUserRepo, UserRepo>();
+            services.AddScoped<ICardRepo, CardRepo>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
