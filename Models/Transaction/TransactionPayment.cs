@@ -13,10 +13,10 @@ namespace basic_banking_app_server.Models.TransactionModel
         public string Description { get; set; }
         public DateTime? CapturedAt { get; set; }
         public DateTime? RefundedAt { get; set; }
-        public int SenderCardId { get; set; }
-        public int ReceiverCardId { get; set; }
+        public string SenderCardNumber { get; set; }
+        public string ReceiverCardNumber { get; set; }
 
-        public virtual Card ReceiverCard { get; set; }
-        public virtual Card SenderCard { get; set; }
+        public virtual Card ReceiverCardNumberNavigation { get; set; }
+        public virtual Card SenderCardNumberNavigation { get; set; }
     }
 }

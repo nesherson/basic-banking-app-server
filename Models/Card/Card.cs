@@ -10,8 +10,8 @@ namespace basic_banking_app_server.Models.CardModel
         public Card()
         {
             TransactionDeposits = new HashSet<TransactionDeposit>();
-            TransactionPaymentReceiverCards = new HashSet<TransactionPayment>();
-            TransactionPaymentSenderCards = new HashSet<TransactionPayment>();
+            TransactionPaymentReceiverCardNumberNavigations = new HashSet<TransactionPayment>();
+            TransactionPaymentSenderCardNumberNavigations = new HashSet<TransactionPayment>();
             TransactionWithdrawals = new HashSet<TransactionWithdrawal>();
         }
 
@@ -24,8 +24,8 @@ namespace basic_banking_app_server.Models.CardModel
 
         public virtual User User { get; set; }
         public virtual ICollection<TransactionDeposit> TransactionDeposits { get; set; }
-        public virtual ICollection<TransactionPayment> TransactionPaymentReceiverCards { get; set; }
-        public virtual ICollection<TransactionPayment> TransactionPaymentSenderCards { get; set; }
+        public virtual ICollection<TransactionPayment> TransactionPaymentReceiverCardNumberNavigations { get; set; }
+        public virtual ICollection<TransactionPayment> TransactionPaymentSenderCardNumberNavigations { get; set; }
         public virtual ICollection<TransactionWithdrawal> TransactionWithdrawals { get; set; }
     }
 }
