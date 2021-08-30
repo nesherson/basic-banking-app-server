@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 using basic_banking_app_server.Models.UserModel;
 using basic_banking_app_server.Models.CardModel;
 using basic_banking_app_server.Models.TransactionModel;
+using basic_banking_app_server.Enums;
 
 namespace basic_banking_app_server.Data.Context
 {
@@ -10,17 +12,19 @@ namespace basic_banking_app_server.Data.Context
     {
         public BasicBankContext()
         {
+            
         }
 
         public BasicBankContext(DbContextOptions<BasicBankContext> options)
             : base(options)
         {
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<TransactionEnums.Method>("transaction_method");
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<TransactionEnums.Status>("transaction_status");
         }
 
+
         public virtual DbSet<Card> Cards { get; set; }
-        public virtual DbSet<TransactionDeposit> TransactionDeposits { get; set; }
-        public virtual DbSet<TransactionPayment> TransactionPayments { get; set; }
-        public virtual DbSet<TransactionWithdrawal> TransactionWithdrawals { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -33,7 +37,9 @@ namespace basic_banking_app_server.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("Relational:Collation", "English_United States.1252");
+            modelBuilder.HasPostgresEnum("method", "transaction_method", new[] { "withdraw", "deposit", "payment" })
+                .HasPostgresEnum("status", "transaction_status", new[] { "pending", "failed", "captured", "refunded" })
+                .HasAnnotation("Relational:Collation", "English_United States.1252");
 
             modelBuilder.Entity<Card>(entity =>
             {
@@ -50,111 +56,77 @@ namespace basic_banking_app_server.Data.Context
                     .IsRequired()
                     .HasColumnName("card_number");
 
-                entity.Property(e => e.Network).HasColumnName("network");
+                entity.Property(e => e.Network)
+                    .IsRequired()
+                    .HasColumnName("network");
 
-                entity.Property(e => e.Type).HasColumnName("type");
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasColumnName("type");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Cards)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("cards_user_id_fkey");
             });
 
-            modelBuilder.Entity<TransactionDeposit>(entity =>
+            modelBuilder.Entity<Transaction>(entity =>
             {
-                entity.ToTable("transaction_deposits");
+                entity.ToTable("transactions");
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Amount).HasColumnName("amount");
+                   
+                entity.Property(e => e.Method).HasColumnName("method")
+                    .HasColumnType("transaction_method");
 
-                entity.Property(e => e.CapturedAt).HasColumnName("captured_at");
+                entity.Property(e => e.Status).HasColumnName("status")
+                    .HasColumnType("transaction_status");
+
+                entity.Property(e => e.CapturedAt)
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("captured_at");
 
                 entity.Property(e => e.CardId).HasColumnName("card_id");
 
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasColumnName("status");
-
-                entity.HasOne(d => d.Card)
-                    .WithMany(p => p.TransactionDeposits)
-                    .HasForeignKey(d => d.CardId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("transaction_deposits_card_id_fkey");
-            });
-
-            modelBuilder.Entity<TransactionPayment>(entity =>
-            {
-                entity.ToTable("transaction_payments");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.Amount).HasColumnName("amount");
-
-                entity.Property(e => e.CapturedAt).HasColumnName("captured_at");
-
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("created_at");
 
                 entity.Property(e => e.Description).HasColumnName("description");
 
-                entity.Property(e => e.ReceiverCardNumber)
-                    .IsRequired()
+                entity.Property(e => e.ReceiverCardNum)
                     .HasMaxLength(16)
-                    .HasColumnName("receiver_card_number");
+                    .HasColumnName("receiver_card_num");
 
-                entity.Property(e => e.RefundedAt).HasColumnName("refunded_at");
+                entity.Property(e => e.RefundedAt)
+                    .HasColumnType("timestamp with time zone")
+                    .HasColumnName("refunded_at");
 
-                entity.Property(e => e.SenderCardNumber)
-                    .IsRequired()
+                entity.Property(e => e.SenderCardNum)
                     .HasMaxLength(16)
-                    .HasColumnName("sender_card_number");
-
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasColumnName("status");
-
-                entity.HasOne(d => d.ReceiverCardNumberNavigation)
-                    .WithMany(p => p.TransactionPaymentReceiverCardNumberNavigations)
-                    .HasPrincipalKey(p => p.CardNumber)
-                    .HasForeignKey(d => d.ReceiverCardNumber)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("transaction_payments_receiver_card_number_fkey");
-
-                entity.HasOne(d => d.SenderCardNumberNavigation)
-                    .WithMany(p => p.TransactionPaymentSenderCardNumberNavigations)
-                    .HasPrincipalKey(p => p.CardNumber)
-                    .HasForeignKey(d => d.SenderCardNumber)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("transaction_payments_sender_card_number_fkey");
-            });
-
-            modelBuilder.Entity<TransactionWithdrawal>(entity =>
-            {
-                entity.ToTable("transaction_withdrawals");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.Amount).HasColumnName("amount");
-
-                entity.Property(e => e.CapturedAt).HasColumnName("captured_at");
-
-                entity.Property(e => e.CardId).HasColumnName("card_id");
-
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasColumnName("status");
+                    .HasColumnName("sender_card_num");
 
                 entity.HasOne(d => d.Card)
-                    .WithMany(p => p.TransactionWithdrawals)
+                    .WithMany(p => p.TransactionCards)
                     .HasForeignKey(d => d.CardId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("transaction_withdrawals_card_id_fkey");
+                    .HasConstraintName("transactions_card_id_fkey");
+
+                entity.HasOne(d => d.ReceiverCardNumNavigation)
+                    .WithMany(p => p.TransactionReceiverCardNumNavigations)
+                    .HasPrincipalKey(p => p.CardNumber)
+                    .HasForeignKey(d => d.ReceiverCardNum)
+                    .HasConstraintName("transactions_receiver_card_num_fkey");
+
+                entity.HasOne(d => d.SenderCardNumNavigation)
+                    .WithMany(p => p.TransactionSenderCardNumNavigations)
+                    .HasPrincipalKey(p => p.CardNumber)
+                    .HasForeignKey(d => d.SenderCardNum)
+                    .HasConstraintName("transactions_sender_card_num_fkey");
             });
 
             modelBuilder.Entity<User>(entity =>
