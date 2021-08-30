@@ -12,6 +12,8 @@ namespace basic_banking_app_server.Profiles
         { 
             CreateMap<TransactionDepositCreateDto, Transaction>().ConstructUsing(e => new Transaction(e.Amount, TransactionEnums.Method.deposit, e.CardId));
             CreateMap<TransactionWithdrawCreateDto, Transaction>().ConstructUsing(e => new Transaction(e.Amount, TransactionEnums.Method.withdraw, e.CardId));
+            CreateMap<Transaction, TransactionDepositReadDto>();
+            CreateMap<Transaction, TransactionWithdrawReadDto>();
         }
     }
 }

@@ -7,7 +7,7 @@ namespace basic_banking_app_server.Data.TransactionRepo
     public interface ITransactionRepo
     {
         IEnumerable<Transaction> GetAllDepositTransactions();
-        IEnumerable<Transaction> GetAllWithdrawalTransactions();
+        IEnumerable<Transaction> GetAllWithdrawTransactions();
         IEnumerable<Transaction> GetAllPaymentTransactions();
         void MakeDeposit(Transaction transactionDeposit);
         void MakeWithdraw(Transaction transactionWithdraw);

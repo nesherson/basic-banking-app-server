@@ -24,21 +24,29 @@ namespace basic_banking_app_server.Data.TransactionRepo
 
         public IEnumerable<Transaction> GetAllDepositTransactions()
         {
-            var transactionsDeposit = _context.Transactions
+            var listOfDepositTransactions = _context.Transactions
                 .Where(transaction => transaction.Method == TransactionEnums.Method.deposit)
                 .ToList();
 
-            return transactionsDeposit;
+            return listOfDepositTransactions;
         }
 
         public IEnumerable<Transaction> GetAllPaymentTransactions()
         {
-            throw new NotImplementedException();
+            var listOfPaymentTransactions = _context.Transactions
+                .Where(transaction => transaction.Method == TransactionEnums.Method.payment)
+                .ToList();
+
+            return listOfPaymentTransactions;
         }
 
-        public IEnumerable<Transaction> GetAllWithdrawalTransactions()
+        public IEnumerable<Transaction> GetAllWithdrawTransactions()
         {
-            throw new NotImplementedException();
+            var listOfWithdrawTransactions = _context.Transactions
+                .Where(transaction => transaction.Method == TransactionEnums.Method.withdraw)
+                .ToList();
+
+            return listOfWithdrawTransactions;
         }
 
         public void MakeDeposit(Transaction transactionDeposit)

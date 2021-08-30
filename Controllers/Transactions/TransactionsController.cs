@@ -64,6 +64,13 @@ namespace basic_banking_app_server.Controllers.Transactions
             return Ok();
         }
 
-        
+        [HttpGet("withdraw")]
+        public ActionResult<IEnumerable<TransactionWithdrawReadDto>> GetAllWithdrawTransactions()
+        {
+            var listOfWithdrawTransactions = _transactionRepo.GetAllWithdrawTransactions();
+            var listOfWithdrawTransactionsReadDto = _mapper.Map<IEnumerable<TransactionWithdrawReadDto>>(listOfWithdrawTransactions);
+
+            return Ok(listOfWithdrawTransactionsReadDto);
+        }
     }
 }
