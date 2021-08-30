@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using AutoMapper;
 
@@ -23,7 +24,11 @@ namespace basic_banking_app_server.Data.TransactionRepo
 
         public IEnumerable<Transaction> GetAllDepositTransactions()
         {
-            throw new NotImplementedException();
+            var transactionsDeposit = _context.Transactions
+                .Where(transaction => transaction.Method == TransactionEnums.Method.deposit)
+                .ToList();
+
+            return transactionsDeposit;
         }
 
         public IEnumerable<Transaction> GetAllPaymentTransactions()

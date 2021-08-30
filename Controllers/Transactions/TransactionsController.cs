@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using System;
+using System.Collections.Generic;
 
 using basic_banking_app_server.Data.TransactionRepo;
 using basic_banking_app_server.Dtos.TransactionDtos;
@@ -37,6 +38,15 @@ namespace basic_banking_app_server.Controllers.Transactions
             return Ok();
         }
 
+        [HttpGet("deposit")]
+        public ActionResult<IEnumerable<TransactionDepositReadDto>> GetAllDepositTransactions()
+        {
+            var transactionsDeposit = _transactionRepo.GetAllDepositTransactions();
+            var transactionsDepositReadDto = _mapper.Map<IEnumerable<TransactionDepositReadDto>>(transactionsDeposit);
+
+            return Ok(transactionsDepositReadDto);
+        }
+
         [HttpPost("withdraw")]
         public ActionResult Withdraw(TransactionWithdrawCreateDto withdrawCreateModel)
         {
@@ -53,5 +63,7 @@ namespace basic_banking_app_server.Controllers.Transactions
 
             return Ok();
         }
+
+        
     }
 }
