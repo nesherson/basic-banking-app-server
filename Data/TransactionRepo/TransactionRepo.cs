@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using AutoMapper;
+
 
 using basic_banking_app_server.Data.Context;
 using basic_banking_app_server.Models.TransactionModel;
 using basic_banking_app_server.Enums;
+using basic_banking_app_server.Dtos.TransactionDtos;
 
 namespace basic_banking_app_server.Data.TransactionRepo
 {
     public class TransactionRepo : ITransactionRepo
     {
         private readonly BasicBankContext _context;
+        private readonly IMapper _mapper;
  
-        public TransactionRepo(BasicBankContext context)
+        public TransactionRepo(BasicBankContext context, IMapper mapper)
         {
+            _mapper = mapper;
             _context = context;
         }
 
@@ -39,15 +44,10 @@ namespace basic_banking_app_server.Data.TransactionRepo
             if (transactionDeposit.Amount <= 0)
                 throw new ArgumentException();
 
-            //Transaction transactionDepositModel = new Transaction(default, transactionDeposit.Amount, TransactionEnums.Method.deposit, TransactionEnums.Status.captured, null, DateTime.Now, DateTime.Now, default, null, null, transactionDeposit.CardId);
-            //transaction.CreatedAt = DateTime.Now;
-            //transaction.CapturedAt = DateTime.Now;
-            //transaction.Status = TransactionEnums.Status.captured;
-            transactionDeposit.CreatedAt = DateTime.Now;
-            transactionDeposit.CapturedAt = DateTime.Now;
-            transactionDeposit.Status = TransactionEnums.Status.captured;
-            transactionDeposit.Method = TransactionEnums.Method.deposit;
-            _context.Transactions.Add(transactionDeposit);
+            TransactionEnums.Method methodDeposit = TransactionEnums.Method.deposit;
+
+            Transaction transactionDepositModel = new Transaction(transactionDeposit.Amount, methodDeposit, transactionDeposit.CardId);
+            _context.Transactions.Add(transactionDepositModel);
             _context.SaveChanges();
         }
         public void MakePayment(Transaction transactionPayment)
@@ -57,7 +57,16 @@ namespace basic_banking_app_server.Data.TransactionRepo
 
         public void MakeWithdraw(Transaction transactionWithdraw)
         {
-            throw new NotImplementedException();
+            if (transactionWithdraw == null)
+                throw new ArgumentNullException(nameof(transactionWithdraw));
+
+            if (transactionWithdraw.Amount <= 0)
+                throw new ArgumentException();
+
+            TransactionEnums.Method methodWithdraw = TransactionEnums.Method.withdraw;
+            Transaction transactionWithdrawModel = new Transaction(transactionWithdraw.Amount, methodWithdraw, transactionWithdraw.CardId);
+            _context.Transactions.Add(transactionWithdrawModel);
+            _context.SaveChanges();
         }
 
         public bool SaveChanges()
