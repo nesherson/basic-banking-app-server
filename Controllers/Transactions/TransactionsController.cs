@@ -22,12 +22,29 @@ namespace basic_banking_app_server.Controllers.Transactions
         }
 
         [HttpPost("deposit")]
-        public ActionResult Deposit(TransactionDepositRegisterDto depositCreateModel)
+        public ActionResult Deposit(TransactionDepositCreateDto depositCreateModel)
         {
             var deposit = _mapper.Map<Transaction>(depositCreateModel);
             try
             {
                 _transactionRepo.MakeDeposit(deposit);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("withdraw")]
+        public ActionResult Withdraw(TransactionWithdrawCreateDto withdrawCreateModel)
+        {
+            var withdraw = _mapper.Map<Transaction>(withdrawCreateModel);
+
+            try
+            {
+                _transactionRepo.MakeWithdraw(withdraw);
             }
             catch (Exception ex)
             {
