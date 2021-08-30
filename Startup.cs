@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using basic_banking_app_server.Data.Context;
 using basic_banking_app_server.Data.UserRepo;
 using basic_banking_app_server.Data.CardRepo;
+using basic_banking_app_server.Data.TransactionRepo;
 
 namespace basic_banking_app_server
 {
@@ -56,6 +57,7 @@ namespace basic_banking_app_server
                         {
                             context.Fail("Unauthorized");
                         }
+                        context.HttpContext.Items["UserId"] = user.Id;
                         return Task.CompletedTask;
                     }
                 };
@@ -73,6 +75,7 @@ namespace basic_banking_app_server
 
             services.AddScoped<IUserRepo, UserRepo>();
             services.AddScoped<ICardRepo, CardRepo>();
+            services.AddScoped<ITransactionRepo, TransactionRepo>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
