@@ -72,5 +72,22 @@ namespace basic_banking_app_server.Controllers.Transactions
 
             return Ok(listOfWithdrawTransactionsReadDto);
         }
+
+        [HttpPost("payment")]
+        public ActionResult Payment(TransactionPaymentCreateDto paymentCreateModel)
+        {
+            var payment = _mapper.Map<Transaction>(paymentCreateModel);
+
+            try
+            {
+                _transactionRepo.MakePayment(payment);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+            return Ok();
+        }
     }
 }

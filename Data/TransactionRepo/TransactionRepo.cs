@@ -59,13 +59,22 @@ namespace basic_banking_app_server.Data.TransactionRepo
 
             TransactionEnums.Method methodDeposit = TransactionEnums.Method.deposit;
 
-            Transaction transactionDepositModel = new Transaction(transactionDeposit.Amount, methodDeposit, transactionDeposit.CardId);
+            Transaction transactionDepositModel = new Transaction(transactionDeposit.Amount, methodDeposit, null, null, null, transactionDeposit.CardId);
             _context.Transactions.Add(transactionDepositModel);
             _context.SaveChanges();
         }
         public void MakePayment(Transaction transactionPayment)
         {
-            throw new NotImplementedException();
+            if (transactionPayment == null)
+                throw new ArgumentNullException(nameof(transactionPayment));
+
+            if (transactionPayment.Amount <= 0)
+                throw new ArgumentException();
+
+            TransactionEnums.Method methodPayment = TransactionEnums.Method.payment;
+            Transaction transactionPaymentModel = new Transaction(transactionPayment.Amount, methodPayment, transactionPayment.Description, transactionPayment.SenderCardNum, transactionPayment.ReceiverCardNum, transactionPayment.CardId);
+            _context.Transactions.Add(transactionPaymentModel);
+            _context.SaveChanges();
         }
 
         public void MakeWithdraw(Transaction transactionWithdraw)
@@ -77,7 +86,7 @@ namespace basic_banking_app_server.Data.TransactionRepo
                 throw new ArgumentException();
 
             TransactionEnums.Method methodWithdraw = TransactionEnums.Method.withdraw;
-            Transaction transactionWithdrawModel = new Transaction(transactionWithdraw.Amount, methodWithdraw, transactionWithdraw.CardId);
+            Transaction transactionWithdrawModel = new Transaction(transactionWithdraw.Amount, methodWithdraw, null, null, null, transactionWithdraw.CardId);
             _context.Transactions.Add(transactionWithdrawModel);
             _context.SaveChanges();
         }
