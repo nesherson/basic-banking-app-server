@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-using basic_banking_app_server.Models;
+using basic_banking_app_server.Models.UserModel;
 using basic_banking_app_server.Dtos.UserDto;
 using basic_banking_app_server.Dtos.AuthDto;
 

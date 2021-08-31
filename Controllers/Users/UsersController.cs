@@ -5,14 +5,11 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 
-using basic_banking_app_server.Models;
+using basic_banking_app_server.Models.UserModel;
 using basic_banking_app_server.Data.UserRepo;
 using basic_banking_app_server.Dtos.UserDto;
 using basic_banking_app_server.Dtos.AuthDto;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System;
+
 
 namespace basic_banking_app_server.Controllers.Users
 {

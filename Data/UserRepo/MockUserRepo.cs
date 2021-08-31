@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using basic_banking_app_server.Models;
+using basic_banking_app_server.Models.UserModel;
 
 namespace basic_banking_app_server.Data.UserRepo
 {

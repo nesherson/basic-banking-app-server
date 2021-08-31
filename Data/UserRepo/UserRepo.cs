@@ -1,5 +1,4 @@
-﻿using basic_banking_app_server.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -7,9 +6,10 @@ using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 using basic_banking_app_server.Data.Context;
+using basic_banking_app_server.Models.UserModel;
+
 
 namespace basic_banking_app_server.Data.UserRepo
 {

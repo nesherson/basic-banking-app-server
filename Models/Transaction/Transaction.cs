@@ -19,24 +19,24 @@ namespace basic_banking_app_server.Models.TransactionModel
             _receiverCardNum = receiverCardNum;
             _cardId = cardId;
         }
+
+        private decimal _amount;
+        private TransactionEnums.Method _method;
+        private string _description;
+        private string _senderCardNum;
+        private string _receiverCardNum;
+        private int _cardId;
         public int Id { get; set; }
         public decimal Amount { get { return _amount; } }
-        private decimal _amount;
-
         public TransactionEnums.Method Method { get { return _method;  } }
-        private TransactionEnums.Method _method;
         public TransactionEnums.Status Status { get; set; }
         public string Description { get { return _description;  } }
-        private string _description;
         public DateTime CreatedAt { get; set; }
         public DateTime CapturedAt { get; set; }
         public DateTime? RefundedAt { get; set; }
         public string SenderCardNum { get { return _senderCardNum; } }
-        private string _senderCardNum;
         public string ReceiverCardNum { get { return _receiverCardNum; } }
-        private string _receiverCardNum;
         public int CardId { get { return _cardId; } }
-        private int _cardId;
         public virtual Card Card { get; set; }
         public virtual Card ReceiverCardNumNavigation { get; set; }
         public virtual Card SenderCardNumNavigation { get; set; }
