@@ -89,5 +89,14 @@ namespace basic_banking_app_server.Controllers.Transactions
 
             return Ok();
         }
+
+        [HttpGet("payment")]
+        public ActionResult GetAllPaymentTransactions()
+        {
+            var listOfPaymentTransactions = _transactionRepo.GetAllPaymentTransactions();
+            var listOfPaymentTransactionsReadDto = _mapper.Map<IEnumerable<TransactionPaymentReadDto>>(listOfPaymentTransactions);
+
+            return Ok(listOfPaymentTransactionsReadDto);
+        }
     }
 }

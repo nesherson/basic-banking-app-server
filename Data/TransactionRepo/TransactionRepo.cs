@@ -21,34 +21,6 @@ namespace basic_banking_app_server.Data.TransactionRepo
             _mapper = mapper;
             _context = context;
         }
-
-        public IEnumerable<Transaction> GetAllDepositTransactions()
-        {
-            var listOfDepositTransactions = _context.Transactions
-                .Where(transaction => transaction.Method == TransactionEnums.Method.deposit)
-                .ToList();
-
-            return listOfDepositTransactions;
-        }
-
-        public IEnumerable<Transaction> GetAllPaymentTransactions()
-        {
-            var listOfPaymentTransactions = _context.Transactions
-                .Where(transaction => transaction.Method == TransactionEnums.Method.payment)
-                .ToList();
-
-            return listOfPaymentTransactions;
-        }
-
-        public IEnumerable<Transaction> GetAllWithdrawTransactions()
-        {
-            var listOfWithdrawTransactions = _context.Transactions
-                .Where(transaction => transaction.Method == TransactionEnums.Method.withdraw)
-                .ToList();
-
-            return listOfWithdrawTransactions;
-        }
-
         public void MakeDeposit(Transaction transactionDeposit)
         {
             if (transactionDeposit == null)
@@ -61,6 +33,19 @@ namespace basic_banking_app_server.Data.TransactionRepo
 
             Transaction transactionDepositModel = new Transaction(transactionDeposit.Amount, methodDeposit, null, null, null, transactionDeposit.CardId);
             _context.Transactions.Add(transactionDepositModel);
+            _context.SaveChanges();
+        }
+        public void MakeWithdraw(Transaction transactionWithdraw)
+        {
+            if (transactionWithdraw == null)
+                throw new ArgumentNullException(nameof(transactionWithdraw));
+
+            if (transactionWithdraw.Amount <= 0)
+                throw new ArgumentException();
+
+            TransactionEnums.Method methodWithdraw = TransactionEnums.Method.withdraw;
+            Transaction transactionWithdrawModel = new Transaction(transactionWithdraw.Amount, methodWithdraw, null, null, null, transactionWithdraw.CardId);
+            _context.Transactions.Add(transactionWithdrawModel);
             _context.SaveChanges();
         }
         public void MakePayment(Transaction transactionPayment)
@@ -76,20 +61,37 @@ namespace basic_banking_app_server.Data.TransactionRepo
             _context.Transactions.Add(transactionPaymentModel);
             _context.SaveChanges();
         }
-
-        public void MakeWithdraw(Transaction transactionWithdraw)
+        public IEnumerable<Transaction> GetAllDepositTransactions()
         {
-            if (transactionWithdraw == null)
-                throw new ArgumentNullException(nameof(transactionWithdraw));
+            var listOfDepositTransactions = _context.Transactions
+                .Where(transaction => transaction.Method == TransactionEnums.Method.deposit)
+                .ToList();
 
-            if (transactionWithdraw.Amount <= 0)
-                throw new ArgumentException();
-
-            TransactionEnums.Method methodWithdraw = TransactionEnums.Method.withdraw;
-            Transaction transactionWithdrawModel = new Transaction(transactionWithdraw.Amount, methodWithdraw, null, null, null, transactionWithdraw.CardId);
-            _context.Transactions.Add(transactionWithdrawModel);
-            _context.SaveChanges();
+            return listOfDepositTransactions;
         }
+        public IEnumerable<Transaction> GetAllWithdrawTransactions()
+        {
+            var listOfWithdrawTransactions = _context.Transactions
+                .Where(transaction => transaction.Method == TransactionEnums.Method.withdraw)
+                .ToList();
+
+            return listOfWithdrawTransactions;
+        }
+        public IEnumerable<Transaction> GetAllPaymentTransactions()
+        {
+            var listOfPaymentTransactions = _context.Transactions
+                .Where(transaction => transaction.Method == TransactionEnums.Method.payment)
+                .ToList();
+
+            return listOfPaymentTransactions;
+        }
+        public IEnumerable<Transaction> GetAllTransactions()
+        {
+            var listOfAllTransactions = _context.Transactions.ToList();
+
+            return listOfAllTransactions;
+        }
+       
 
         public bool SaveChanges()
         {
