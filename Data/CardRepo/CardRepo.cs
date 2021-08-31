@@ -28,5 +28,14 @@ namespace basic_banking_app_server.Data.CardRepo
 
             return card;
         }
+
+        public Card GetCardByUserId(int userId)
+        {
+            var card = _context.Cards.FirstOrDefault(card => card.UserId == userId);
+
+            return card;
+        }
+
+        
     }
 }

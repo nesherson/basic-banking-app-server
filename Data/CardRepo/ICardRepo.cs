@@ -8,5 +8,6 @@ namespace basic_banking_app_server.Data.CardRepo
     {
         IEnumerable<Card> GetAllCards();
         Card GetCardById(int id);
+        Card GetCardByUserId(int userId);
     }
 }
