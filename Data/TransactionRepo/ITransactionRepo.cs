@@ -14,6 +14,5 @@ namespace basic_banking_app_server.Data.TransactionRepo
         void MakeWithdraw(Transaction transactionWithdraw);
         void MakePayment(Transaction transactionPayment);
         bool SaveChanges();
-
     }
 }

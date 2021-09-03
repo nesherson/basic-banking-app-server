@@ -9,12 +9,12 @@ using basic_banking_app_server.Models.UserModel;
 using basic_banking_app_server.Data.UserRepo;
 using basic_banking_app_server.Dtos.UserDto;
 using basic_banking_app_server.Dtos.AuthDto;
-
+using System;
 
 namespace basic_banking_app_server.Controllers.Users
 {
     [Authorize]
-    [Route("")]
+    [Route("auth")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -35,17 +35,20 @@ namespace basic_banking_app_server.Controllers.Users
         public ActionResult<UserReadDto> SignupUser(UserRegisterDto registerModel)
         {
             var userModel = _mapper.Map<User>(registerModel);
-            bool isEmailUsed = _repository.IsEmailUsed(userModel.Email);
 
-            if (isEmailUsed)
-                return Conflict(new { message = "Email already exists." });
-
-            _repository.CreateUser(userModel);
-            _repository.SaveChanges();
+            try
+            {
+                _repository.CreateUser(userModel);
+                _repository.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message});
+            }
 
             var userReadDto = _mapper.Map<UserReadDto>(userModel);
 
-            return CreatedAtRoute(nameof(SignupUser), userReadDto);
+            return Ok(userReadDto);
         }
 
         [AllowAnonymous]
@@ -57,7 +60,7 @@ namespace basic_banking_app_server.Controllers.Users
             if (user == null)
                 return BadRequest(new { message = "Email or password is incorrect" });
 
-            var userTokenModel = _mapper.Map<User, UserTokenDto>(user);
+            var userTokenModel = _mapper.Map<UserTokenDto>(user);
             userTokenModel.Token = _repository.GenerateJwtToken(user);
 
             return Ok(userTokenModel);

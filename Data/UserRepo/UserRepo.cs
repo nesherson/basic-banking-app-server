@@ -86,7 +86,7 @@ namespace basic_banking_app_server.Data.UserRepo
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _context.Users.SingleOrDefault(x => x.Email == email);
+            var user = _context.Users.SingleOrDefault(user => user.Email == email);
 
             if (user == null)
                 return null;
@@ -134,6 +134,12 @@ namespace basic_banking_app_server.Data.UserRepo
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
+
+            bool isEmailUsed = IsEmailUsed(user.Email);
+
+            if (isEmailUsed)
+                throw new ArgumentException("Email is already used.");
+
 
             string hashedPassword = HashPassword(user.Password);
             user.Password = hashedPassword;
