@@ -16,6 +16,7 @@ namespace basic_banking_app_server.Profiles
             CreateMap<Transaction, TransactionDepositReadDto>();
             CreateMap<Transaction, TransactionWithdrawReadDto>();
             CreateMap<Transaction, TransactionPaymentReadDto>();
+            CreateMap<Transaction, TransactionGeneralReadDto>();
         }
     }
 }
