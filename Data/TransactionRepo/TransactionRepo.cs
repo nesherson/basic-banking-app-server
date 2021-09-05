@@ -97,5 +97,43 @@ namespace basic_banking_app_server.Data.TransactionRepo
         {
             return _context.SaveChanges() >= 0;
         }
+
+        public IEnumerable<Transaction> GetAllDepositTransactionsByCardId(int cardId)
+        {
+            var transactions = _context.Transactions
+                .Where(t => t.CardId == cardId && t.Method == TransactionEnums.Method.deposit)
+                .ToList();
+
+            return transactions;
+        }
+
+        public IEnumerable<Transaction> GetAllWithdrawTransactionsByCardId(int cardId)
+        {
+            var transactions = _context.Transactions
+               .Where(t => t.CardId == cardId && t.Method == TransactionEnums.Method.withdraw)
+               .ToList();
+
+            return transactions;
+        }
+
+        public IEnumerable<Transaction> GetAllPaymentTransactionsByCardNum(string cardNum)
+        {
+            var transactions = _context.Transactions
+               .Where(t => t.SenderCardNum == cardNum || t.ReceiverCardNum == cardNum)
+               .ToList();
+
+            return transactions;
+        }
+        public IEnumerable<Transaction> GetLatestTransactionsByCardIdOrCardNum(int cardId, string cardNum, int resultLimit=4) 
+        {
+            var transactions = _context.Transactions
+                .Where(t => t.CardId == cardId || t.SenderCardNum == cardNum || t.ReceiverCardNum == cardNum)
+                .OrderByDescending(t => t.CreatedAt)
+                .Take(resultLimit)
+                .ToList();
+
+            return transactions;
+               
+        }
     }
 }

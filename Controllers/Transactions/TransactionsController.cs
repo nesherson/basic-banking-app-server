@@ -2,23 +2,28 @@
 using AutoMapper;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 using basic_banking_app_server.Data.TransactionRepo;
 using basic_banking_app_server.Dtos.TransactionDtos;
 using basic_banking_app_server.Models.TransactionModel;
+using basic_banking_app_server.Data.CardRepo;
 
 namespace basic_banking_app_server.Controllers.Transactions
 {
+    [Authorize]
     [Route("transactions")]
     [ApiController]
     public class TransactionsController : ControllerBase
     {
         private readonly ITransactionRepo _transactionRepo;
+        private readonly ICardRepo _cardRepo;
         private readonly IMapper _mapper;
 
-        public TransactionsController(ITransactionRepo transactionRepo, IMapper mapper)
+        public TransactionsController(ITransactionRepo transactionRepo, ICardRepo cardRepo, IMapper mapper)
         {
             _transactionRepo = transactionRepo;
+            _cardRepo = cardRepo;
             _mapper = mapper;
         }
 
@@ -41,10 +46,10 @@ namespace basic_banking_app_server.Controllers.Transactions
         [HttpGet("deposit")]
         public ActionResult<IEnumerable<TransactionDepositReadDto>> GetAllDepositTransactions()
         {
-            var transactionsDeposit = _transactionRepo.GetAllDepositTransactions();
-            var transactionsDepositReadDto = _mapper.Map<IEnumerable<TransactionDepositReadDto>>(transactionsDeposit);
+            var transactions = _transactionRepo.GetAllDepositTransactions();
+            var transactionsReadDto = _mapper.Map<IEnumerable<TransactionDepositReadDto>>(transactions);
 
-            return Ok(transactionsDepositReadDto);
+            return Ok(transactionsReadDto);
         }
 
         [HttpPost("withdraw")]
@@ -67,10 +72,10 @@ namespace basic_banking_app_server.Controllers.Transactions
         [HttpGet("withdraw")]
         public ActionResult<IEnumerable<TransactionWithdrawReadDto>> GetAllWithdrawTransactions()
         {
-            var listOfWithdrawTransactions = _transactionRepo.GetAllWithdrawTransactions();
-            var listOfWithdrawTransactionsReadDto = _mapper.Map<IEnumerable<TransactionWithdrawReadDto>>(listOfWithdrawTransactions);
+            var transactions = _transactionRepo.GetAllWithdrawTransactions();
+            var transactionsReadDto = _mapper.Map<IEnumerable<TransactionWithdrawReadDto>>(transactions);
 
-            return Ok(listOfWithdrawTransactionsReadDto);
+            return Ok(transactionsReadDto);
         }
 
         [HttpPost("payment")]
@@ -91,12 +96,29 @@ namespace basic_banking_app_server.Controllers.Transactions
         }
 
         [HttpGet("payment")]
-        public ActionResult GetAllPaymentTransactions()
+        public ActionResult<IEnumerable<TransactionPaymentReadDto>> GetAllPaymentTransactions()
         {
-            var listOfPaymentTransactions = _transactionRepo.GetAllPaymentTransactions();
-            var listOfPaymentTransactionsReadDto = _mapper.Map<IEnumerable<TransactionPaymentReadDto>>(listOfPaymentTransactions);
+            var transactions = _transactionRepo.GetAllPaymentTransactions();
+            var transactionsReadDto = _mapper.Map<IEnumerable<TransactionPaymentReadDto>>(transactions);
 
-            return Ok(listOfPaymentTransactionsReadDto);
+            return Ok(transactionsReadDto);
         }
+
+        [HttpGet("{cardId}/latest")]
+        public ActionResult GetLatestTransactions(int cardId, [FromQuery] int resultLimit)
+        {
+            var card = _cardRepo.GetCardById(cardId);
+            var transactions = _transactionRepo.GetLatestTransactionsByCardIdOrCardNum(cardId, card.CardNumber, resultLimit);
+
+            if (transactions == null)
+                return NotFound();
+
+            var transactionsReadDto = _mapper.Map<IEnumerable<TransactionGeneralReadDto>>(transactions);
+
+            return Ok(transactionsReadDto);
+        }
+
+
+
     }
 }

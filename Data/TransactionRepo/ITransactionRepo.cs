@@ -9,6 +9,10 @@ namespace basic_banking_app_server.Data.TransactionRepo
         IEnumerable<Transaction> GetAllDepositTransactions();
         IEnumerable<Transaction> GetAllWithdrawTransactions();
         IEnumerable<Transaction> GetAllPaymentTransactions();
+        IEnumerable<Transaction> GetAllDepositTransactionsByCardId(int cardId);
+        IEnumerable<Transaction> GetAllWithdrawTransactionsByCardId(int cardId);
+        IEnumerable<Transaction> GetAllPaymentTransactionsByCardNum(string cardNum);
+        IEnumerable<Transaction> GetLatestTransactionsByCardIdOrCardNum(int cardId, string cardNum, int resultLimit);
         IEnumerable<Transaction> GetAllTransactions();
         void MakeDeposit(Transaction transactionDeposit);
         void MakeWithdraw(Transaction transactionWithdraw);
