@@ -32,6 +32,14 @@ namespace basic_banking_app_server
             string dbKey = Configuration["ConnectionString"];
             services.AddDbContext<BasicBankContext>(options => options.UseNpgsql(dbKey));
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder => {
+                        builder.WithOrigins("http://localhost:5000").AllowAnyOrigin().AllowAnyHeader();
+                    });
+            });
+
             services.AddControllers().AddNewtonsoftJson(s => {
                 s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
@@ -86,6 +94,8 @@ namespace basic_banking_app_server
             }
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
