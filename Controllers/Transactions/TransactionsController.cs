@@ -108,6 +108,14 @@ namespace basic_banking_app_server.Controllers.Transactions
         public ActionResult GetLatestTransactions(int cardId, [FromQuery] int resultLimit)
         {
             var card = _cardRepo.GetCardById(cardId);
+
+            bool isUserAuthorized = _cardRepo.Authorize(card.UserId);
+
+            if (!isUserAuthorized)
+            {
+                return Forbid();
+            }
+
             var transactions = _transactionRepo.GetLatestTransactionsByCardIdOrCardNum(cardId, card.CardNumber, resultLimit);
 
             if (transactions == null)
