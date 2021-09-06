@@ -14,18 +14,18 @@ using System;
 namespace basic_banking_app_server.Controllers.Users
 {
     [Authorize]
-    [Route("auth")]
+    [Route("users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IUserRepo _repository;
+        private readonly IUserRepo _userRepository;
         private readonly IMapper _mapper;
 
         public UsersController(IUserRepo repository, IMapper mapper, IConfiguration configuration)
         {
             _configuration = configuration;
-            _repository = repository;
+            _userRepository = repository;
             _mapper = mapper;
         }
 
@@ -38,8 +38,8 @@ namespace basic_banking_app_server.Controllers.Users
 
             try
             {
-                _repository.CreateUser(userModel);
-                _repository.SaveChanges();
+                _userRepository.CreateUser(userModel);
+                _userRepository.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -55,30 +55,30 @@ namespace basic_banking_app_server.Controllers.Users
         [HttpPost("login")]
         public ActionResult LoginUser(UserAuthDto authModel)
         {
-            var user = _repository.Authenticate(authModel.Email, authModel.Password);
+            var user = _userRepository.Authenticate(authModel.Email, authModel.Password);
 
             if (user == null)
                 return BadRequest(new { message = "Email or password is incorrect" });
 
             var userTokenModel = _mapper.Map<UserTokenDto>(user);
-            userTokenModel.Token = _repository.GenerateJwtToken(user);
+            userTokenModel.Token = _userRepository.GenerateJwtToken(user);
 
             return Ok(userTokenModel);
         }
 
-        [HttpGet("users")]
+        [HttpGet]
         public ActionResult<IEnumerable<User>> GetAllUsers()
         {
-            var users = _repository.GetAllUsers();
+            var users = _userRepository.GetAllUsers();
             var usersReadModel = _mapper.Map<IEnumerable<UserReadDto>>(users);
 
             return Ok(usersReadModel);
         }
 
-        [HttpGet("users/{id}", Name = "GetUserById")]
+        [HttpGet("{id}", Name = "GetUserById")]
         public ActionResult<User> GetUserById(int id)
         {
-            var user = _repository.GetUserById(id);
+            var user = _userRepository.GetUserById(id);
 
             if (user == null)
                 return NotFound();
@@ -88,22 +88,22 @@ namespace basic_banking_app_server.Controllers.Users
             return Ok(userReadModel);
         }
 
-        [HttpPost("users")]
+        [HttpPost]
         public ActionResult<UserReadDto> CreateUser(UserCreateDto userCreateDto)
         {
             var userModel = _mapper.Map<User>(userCreateDto);
-            _repository.CreateUser(userModel);
-            _repository.SaveChanges();
+            _userRepository.CreateUser(userModel);
+            _userRepository.SaveChanges();
 
             var userReadDto = _mapper.Map<UserReadDto>(userModel);
 
             return CreatedAtRoute(nameof(GetUserById), new { id = userReadDto.Id }, userReadDto);
         }
 
-        [HttpPatch("users/{id}")]
+        [HttpPatch("{id}")]
         public ActionResult UpdateUser(int id, JsonPatchDocument<UserUpdateDto> patchDoc)
         {
-            var userRepoModel = _repository.GetUserById(id);
+            var userRepoModel = _userRepository.GetUserById(id);
 
             if (userRepoModel == null)
                 return NotFound();
@@ -115,7 +115,7 @@ namespace basic_banking_app_server.Controllers.Users
                 return ValidationProblem(ModelState);
 
             _mapper.Map(userToPatch, userRepoModel);
-            _repository.SaveChanges();
+            _userRepository.SaveChanges();
 
             return NoContent();
         }
