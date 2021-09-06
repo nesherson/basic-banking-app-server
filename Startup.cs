@@ -32,6 +32,8 @@ namespace basic_banking_app_server
             string dbKey = Configuration["ConnectionString"];
             services.AddDbContext<BasicBankContext>(options => options.UseNpgsql(dbKey));
 
+            services.AddHttpContextAccessor();
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
@@ -65,7 +67,7 @@ namespace basic_banking_app_server
                         {
                             context.Fail("Unauthorized");
                         }
-                        context.HttpContext.Items["UserId"] = user.Id;
+                        context.HttpContext.Items["userId"] = user.Id;
                         return Task.CompletedTask;
                     }
                 };
