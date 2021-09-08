@@ -104,7 +104,7 @@ namespace basic_banking_app_server.Controllers.Transactions
             return Ok(transactionsReadDto);
         }
 
-        [HttpGet("{cardId}/latest")]
+        [HttpGet("card/{cardId}/latest")]
         public ActionResult GetLatestTransactions(int cardId, [FromQuery] int resultLimit)
         {
             var card = _cardRepo.GetCardById(cardId);
