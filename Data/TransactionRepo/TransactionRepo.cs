@@ -124,16 +124,35 @@ namespace basic_banking_app_server.Data.TransactionRepo
 
             return transactions;
         }
-        public IEnumerable<Transaction> GetLatestTransactionsByCardIdOrCardNum(int cardId, string cardNum, int resultLimit=4) 
+        public IEnumerable<Transaction> GetLatestTransactionsByCardIdOrCardNum(int cardId, string cardNum, int resultLimit) 
         {
-            var transactions = _context.Transactions
-                .Where(t => t.CardId == cardId || t.SenderCardNum == cardNum || t.ReceiverCardNum == cardNum)
-                .OrderByDescending(t => t.CreatedAt)
-                .Take(resultLimit)
-                .ToList();
+            if (resultLimit == 0)
+            {
+                var transactions = _context.Transactions
+               .Where(t => t.CardId == cardId || t.SenderCardNum == cardNum || t.ReceiverCardNum == cardNum)
+               .OrderByDescending(t => t.CreatedAt)
+               .ToList();
+                return transactions;
+            }
+            else
+            {
+                var transactions = _context.Transactions
+               .Where(t => t.CardId == cardId || t.SenderCardNum == cardNum || t.ReceiverCardNum == cardNum)
+               .OrderByDescending(t => t.CreatedAt)
+               .Take(resultLimit)
+               .ToList();
+                return transactions;
+            }
+        }
 
-            return transactions;
-               
+        public IEnumerable<Transaction> GetLastMonthTransactionsByCardIdOrCardNum(int cardId, string cardNum, DateTime dateLimit)
+        {
+                var transactions = _context.Transactions
+               .Where(t => t.CardId == cardId || t.SenderCardNum == cardNum || t.ReceiverCardNum == cardNum)
+               .Where(t => t.CreatedAt >= dateLimit)
+               .OrderByDescending(t => t.CreatedAt)
+               .ToList();
+                return transactions;   
         }
     }
 }

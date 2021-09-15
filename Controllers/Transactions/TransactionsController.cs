@@ -126,6 +126,32 @@ namespace basic_banking_app_server.Controllers.Transactions
             return Ok(transactionsReadDto);
         }
 
+        [HttpGet("card/{cardId}/last-month")]
+        public ActionResult GetTransactionsFromLastMonth(int cardId)
+        {
+            var card = _cardRepo.GetCardById(cardId);
+
+            bool isUserAuthorized = _cardRepo.Authorize(card.UserId);
+
+            if (!isUserAuthorized)
+            {
+                return Forbid();
+            }
+
+            DateTime currentDateTime = DateTime.UtcNow;
+            TimeSpan monthSpan = TimeSpan.FromDays(30);
+            DateTime dateLimit = currentDateTime.Subtract(monthSpan);
+
+            var transactions = _transactionRepo.GetLastMonthTransactionsByCardIdOrCardNum(cardId, card.CardNumber, dateLimit);
+
+            if (transactions == null)
+                return NotFound();
+
+            var transactionsReadDto = _mapper.Map<IEnumerable<TransactionGeneralReadDto>>(transactions);
+
+            return Ok(transactionsReadDto);
+        }
+
 
 
     }
